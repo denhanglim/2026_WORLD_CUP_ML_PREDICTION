@@ -70,4 +70,8 @@ def build_features(df: pd.DataFrame, form_window: int = 5,
     feats["result"] = df["result"].values
     feats["date"] = df["date"].values
     feats["tournament"] = df["tournament"].values
+    # raw match columns carried as metadata so goal-based models (M1) can read them
+    for col in ["home_team", "away_team", "home_score", "away_score"]:
+        feats[col] = df[col].values
+    feats["neutral_flag"] = df["neutral"].values   # bool; 'neutral' feature col already exists
     return feats
