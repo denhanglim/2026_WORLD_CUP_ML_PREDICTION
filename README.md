@@ -63,9 +63,9 @@ A light, playful World Cup **sticker-album** (three.js + GSAP). Spin the foil ba
 |---|---|
 | ![Album](docs/screenshots/album.png) | ![Team detail](docs/screenshots/team-detail.png) |
 
-| The Maths page (KaTeX) | Mobile |
-|---|---|
-| ![Maths](docs/screenshots/math-desktop.png) | ![Mobile](docs/screenshots/mobile.png) |
+Mobile 
+---
+ ![Mobile](docs/screenshots/mobile.png) 
 
 ---
 
