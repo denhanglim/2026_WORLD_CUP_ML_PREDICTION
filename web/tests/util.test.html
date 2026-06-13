@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>util.js tests — THE ALBUM '26</title>
+  <style>
+    body { font-family: monospace; padding: 24px; background: #FAF3E0; color: #2B2A26; }
+    .pass { color: #2E7D46; }
+    .fail { color: #C02020; font-weight: bold; }
+    h1 { font-size: 18px; }
+    pre { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>util.js behaviour tests</h1>
+  <pre id="out"></pre>
+  <script type="module">
+    import { pct, barWidth, isFoil, tintFor, groupChip, ladder, maxWin } from "../js/util.js";
+
+    const out = document.getElementById("out");
+    let passed = 0, failed = 0;
+    function eq(actual, expected, name) {
+      const a = JSON.stringify(actual), e = JSON.stringify(expected);
+      const ok = a === e;
+      ok ? passed++ : failed++;
+      const line = document.createElement("div");
+      line.className = ok ? "pass" : "fail";
+      line.textContent = `${ok ? "PASS" : "FAIL"}  ${name}` + (ok ? "" : `\n   expected ${e}\n   got      ${a}`);
+      out.appendChild(line);
+    }
+
+    // pct
+    eq(pct(0.2034), "20.3%", "pct rounds favourite to 20.3%");
+    eq(pct(0.0), "0%", "pct keeps true zero clean");
+    eq(pct(0.9812), "98.1%", "pct rounds qualify");
+    eq(pct(0.1197, 1), "12.0%", "pct rounds Spain win");
+
+    // barWidth — scaled vs leader, floored at 2
+    eq(barWidth(0.2034, 0.2034), 100, "leader bar is full width");
+    eq(barWidth(0.1017, 0.2034), 50, "half of leader is 50%");
+    eq(barWidth(0.0, 0.2034), 0, "zero prob is zero width");
+    eq(barWidth(0.0001, 0.2034), 2, "tiny prob floored at 2%");
+
+    // isFoil — top 6
+    eq(isFoil(1), true, "rank 1 is foil");
+    eq(isFoil(6), true, "rank 6 is foil");
+    eq(isFoil(7), false, "rank 7 is not foil");
+
+    // tintFor — rotates sky/mint/peach
+    eq(tintFor(7), "sky", "rank 7 -> sky");
+    eq(tintFor(8), "mint", "rank 8 -> mint");
+    eq(tintFor(9), "peach", "rank 9 -> peach");
+    eq(tintFor(10), "sky", "rank 10 wraps to sky");
+
+    // groupChip
+    eq(groupChip("a"), "GRP A", "group chip uppercases");
+
+    // ladder — 6 rungs deepest-first
+    const team = { p_win: 0.2, p_final: 0.3, p_sf: 0.48, p_qf: 0.62, p_r16: 0.78, p_qualify: 0.97 };
+    const rungs = ladder(team);
+    eq(rungs.length, 6, "ladder has 6 rungs");
+    eq(rungs[0].label, "Qualify", "ladder starts at Qualify");
+    eq(rungs[5].label, "Win it", "ladder ends at Win it");
+    eq(rungs[5].p, 0.2, "ladder win prob mapped");
+    eq(ladder(null), [], "ladder of null is empty");
+
+    // maxWin
+    eq(maxWin([{ p_win: 0.2 }, { p_win: 0.1 }]), 0.2, "maxWin picks leader");
+    eq(maxWin([]), 1, "maxWin of empty is 1 (safe)");
+
+    out.insertAdjacentHTML("afterbegin",
+      `<div><strong>${failed === 0 ? "ALL GREEN" : "FAILURES"}: ${passed} passed, ${failed} failed</strong></div>\n`);
+    document.title = `${failed === 0 ? "PASS" : "FAIL"} util tests`;
+  </script>
+</body>
+</html>
