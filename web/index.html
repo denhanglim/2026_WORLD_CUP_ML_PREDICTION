@@ -31,50 +31,71 @@
   </script>
 </head>
 <body>
-  <!-- Print-stock halftone texture overlay (decorative) -->
+  <!-- Print-stock textures (decorative): halftone dots + paper grain -->
   <div class="halftone" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
   <a class="skip-link" href="#album">Skip to the album</a>
 
   <!-- ============================ HERO ============================ -->
   <header class="hero" id="top">
+    <!-- Print registration crosshairs in the corners -->
+    <span class="reg-mark reg-tl" aria-hidden="true"></span>
+    <span class="reg-mark reg-tr" aria-hidden="true"></span>
+    <span class="reg-mark reg-bl" aria-hidden="true"></span>
+    <span class="reg-mark reg-br" aria-hidden="true"></span>
+
+    <!-- Giant ghosted year bleeding off the right edge -->
+    <span class="ghost-year" aria-hidden="true" data-parallax="0.12">26</span>
+
+    <!-- Faint pitch-line baseline grid -->
     <div class="pitch-lines" aria-hidden="true">
       <span class="pl-circle"></span>
       <span class="pl-halfway"></span>
       <span class="pl-box"></span>
+      <span class="pl-spot"></span>
     </div>
 
     <nav class="album-topnav" aria-label="Primary">
-      <a class="topnav-link" href="./math.html">The Maths</a>
+      <span class="brand-stamp" aria-hidden="true">★&nbsp;THE&nbsp;ALBUM&nbsp;&rsquo;26</span>
+      <a class="topnav-link" href="./math.html">The&nbsp;Maths</a>
     </nav>
 
     <div class="hero-inner">
       <div class="hero-copy">
-        <p class="kicker">Official Sticker Album</p>
-        <h1 class="hero-title">Who<br />Lifts It?</h1>
-        <p class="hero-sub">FIFA World Cup 2026</p>
+        <p class="kicker"><span class="kicker-dot" aria-hidden="true"></span>Official Sticker Album · Vol. 26</p>
+        <h1 class="hero-title">
+          <span class="ht-line ht-1">Who</span>
+          <span class="ht-line ht-2">Lifts<em> it</em>?</span>
+        </h1>
+        <p class="hero-sub">FIFA World Cup &mdash; North America 2026</p>
         <p class="hero-method" id="hero-method">
           Loading the model&hellip;
         </p>
         <nav class="hero-nav" aria-label="Sections">
-          <a class="btn btn-coral" href="#album">See all 48 stickers</a>
-          <a class="btn btn-ghost" href="./math.html">How it works</a>
+          <a class="btn btn-magnetic" id="cta-album" href="#album">
+            <span class="btn-fill" aria-hidden="true"></span>
+            <span class="btn-label">Open the album <span class="btn-arrow" aria-hidden="true">&rarr;</span></span>
+          </a>
+          <a class="btn-text" href="./math.html"><span>See how it works</span></a>
         </nav>
       </div>
 
       <div class="hero-stage">
-        <!-- 3D foil ball mounts here -->
+        <!-- 3D glossy football mounts here -->
         <div class="ball-wrap" id="ball-wrap" aria-hidden="true"></div>
 
-        <!-- The favourite as a rare gold-foil sticker -->
+        <!-- The favourite as a large, tilted, peeling rare gold-foil sticker -->
         <figure class="foil-feature" id="foil-feature" aria-live="polite">
+          <span class="ff-peel" aria-hidden="true"></span>
           <div class="foil-feature-shine" aria-hidden="true"></div>
-          <span class="rare-tag">RARE</span>
+          <span class="rare-tag" aria-hidden="true">★ RARE</span>
+          <span class="ff-slot" aria-hidden="true">#01</span>
           <span class="ff-flag" id="ff-flag">🏆</span>
           <figcaption class="ff-body">
-            <span class="ff-rank">#1 · THE FAVOURITE</span>
-            <span class="ff-name" id="ff-name">—</span>
-            <span class="ff-pct" id="ff-pct" data-target="0">0%</span>
+            <span class="ff-rank">THE FAVOURITE</span>
+            <span class="ff-name" id="ff-name">&mdash;</span>
+            <span class="ff-pct" id="ff-pct" data-target="0"><span class="ff-pct-num">0</span><span class="ff-pct-unit">%</span></span>
             <span class="ff-label">chance to lift the trophy</span>
           </figcaption>
         </figure>
@@ -90,24 +111,37 @@
   <main>
     <!-- ============================ ALBUM ============================ -->
     <section class="album" id="album" aria-labelledby="album-h">
-      <div class="section-head">
-        <p class="kicker">The Album</p>
-        <h2 id="album-h">48 Stickers · One Trophy</h2>
-        <p class="section-lede">
-          Every qualified nation, ranked by its modelled chance of lifting the cup.
-          The top six are the rare gold-foil contenders. Tap any sticker for its road to the final.
-        </p>
+      <div class="album-page">
+        <header class="album-page-head">
+          <div class="aph-left">
+            <p class="kicker"><span class="kicker-dot" aria-hidden="true"></span>The Album · Page One</p>
+            <h2 id="album-h">All <span class="aph-count">48</span> Stickers</h2>
+            <p class="section-lede">
+              Every qualified nation, ranked by its modelled chance of lifting the cup.
+              The top six are the rare gold-foil contenders &mdash; the rest, matte paper.
+              Tap any sticker for its road to the final.
+            </p>
+          </div>
+          <div class="aph-right" aria-hidden="true">
+            <span class="page-stamp">PANEL&nbsp;01&nbsp;/&nbsp;01</span>
+            <span class="page-num">p.&nbsp;1</span>
+          </div>
+        </header>
+
+        <span class="album-spine" aria-hidden="true"></span>
+
+        <ul class="sticker-grid" id="sticker-grid" role="list" aria-label="Teams ranked by title probability">
+          <!-- sticker slots injected by album.js -->
+        </ul>
       </div>
-      <ul class="sticker-grid" id="sticker-grid" role="list" aria-label="Teams ranked by title probability">
-        <!-- sticker cards injected by album.js -->
-      </ul>
     </section>
 
     <!-- ============================ HOW IT WORKS ============================ -->
     <section class="rules" id="rules" aria-labelledby="rules-h">
       <div class="rules-card">
-        <p class="kicker">Album Rules</p>
-        <h2 id="rules-h">How it works (and what it isn&rsquo;t)</h2>
+        <span class="rules-stamp" aria-hidden="true">ALBUM<br />RULES</span>
+        <p class="kicker"><span class="kicker-dot" aria-hidden="true"></span>The Fine Print</p>
+        <h2 id="rules-h">How it works <em>(and what it isn&rsquo;t)</em></h2>
         <div class="rules-grid">
           <ol class="rules-steps">
             <li>

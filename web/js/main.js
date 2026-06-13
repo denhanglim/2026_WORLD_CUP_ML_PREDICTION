@@ -52,7 +52,9 @@ async function main() {
   document.getElementById("ff-flag").textContent = fav.flag;
   document.getElementById("ff-name").textContent = fav.team;
   const ffPct = document.getElementById("ff-pct");
+  const ffNum = ffPct.querySelector(".ff-pct-num");
   ffPct.dataset.target = String(fav.p_win);
+  const setFavPct = (p) => { ffNum.textContent = pct(p).replace("%", ""); };
 
   const { gsap, ScrollTrigger } = await loadGsap();
 
@@ -61,10 +63,10 @@ async function main() {
     const obj = { v: 0 };
     gsap.to(obj, {
       v: fav.p_win, duration: 1.2, ease: "power2.out", delay: 0.4,
-      onUpdate: () => { ffPct.textContent = pct(obj.v); },
+      onUpdate: () => { setFavPct(obj.v); },
     });
   } else {
-    ffPct.textContent = pct(fav.p_win);
+    setFavPct(fav.p_win);
   }
 
   // ---- Team detail modal ----
