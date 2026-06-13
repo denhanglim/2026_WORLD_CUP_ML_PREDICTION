@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Data cache (large / reproducible from sources)
+data/raw/
+data/cache/
+*.parquet
+*.feather
+
+# Model artifacts
+models/**/*.nc
+models/**/*.pkl
+models/**/*.joblib
+*.netcdf
+
+# Sim outputs (regenerable)
+sim/out/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
