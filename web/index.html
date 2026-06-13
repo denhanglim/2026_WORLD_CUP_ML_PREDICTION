@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>THE ALBUM '26 — Who Lifts It?</title>
+  <meta name="description" content="A playful sticker-album dashboard for the 2026 World Cup title-probability model. 48 teams, ranked by a self-built Bayesian Monte Carlo model." />
+
+  <!-- Fonts: Bricolage Grotesque (display), Fraunces (body), Space Mono (stats) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Inline SVG football favicon (no extra request, keeps console clean) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23fff' stroke='%232B2A26' stroke-width='2'/%3E%3Cpolygon points='16,9 21,13 19,19 13,19 11,13' fill='%232B2A26'/%3E%3C/svg%3E" />
+
+  <link rel="stylesheet" href="./css/styles.css" />
+
+  <!-- three.js + GSAP via CDN ESM importmap. No build step. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+      "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js",
+      "gsap/ScrollTrigger": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/ScrollTrigger.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Print-stock halftone texture overlay (decorative) -->
+  <div class="halftone" aria-hidden="true"></div>
+
+  <a class="skip-link" href="#album">Skip to the album</a>
+
+  <!-- ============================ HERO ============================ -->
+  <header class="hero" id="top">
+    <div class="pitch-lines" aria-hidden="true">
+      <span class="pl-circle"></span>
+      <span class="pl-halfway"></span>
+      <span class="pl-box"></span>
+    </div>
+
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <p class="kicker">Official Sticker Album</p>
+        <h1 class="hero-title">Who<br />Lifts It?</h1>
+        <p class="hero-sub">FIFA World Cup 2026</p>
+        <p class="hero-method" id="hero-method">
+          Loading the model&hellip;
+        </p>
+        <nav class="hero-nav" aria-label="Sections">
+          <a class="btn btn-coral" href="#album">See all 48 stickers</a>
+          <a class="btn btn-ghost" href="#rules">How it works</a>
+        </nav>
+      </div>
+
+      <div class="hero-stage">
+        <!-- 3D foil ball mounts here -->
+        <div class="ball-wrap" id="ball-wrap" aria-hidden="true"></div>
+
+        <!-- The favourite as a rare gold-foil sticker -->
+        <figure class="foil-feature" id="foil-feature" aria-live="polite">
+          <div class="foil-feature-shine" aria-hidden="true"></div>
+          <span class="rare-tag">RARE</span>
+          <span class="ff-flag" id="ff-flag">🏆</span>
+          <figcaption class="ff-body">
+            <span class="ff-rank">#1 · THE FAVOURITE</span>
+            <span class="ff-name" id="ff-name">—</span>
+            <span class="ff-pct" id="ff-pct" data-target="0">0%</span>
+            <span class="ff-label">chance to lift the trophy</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <a class="scroll-cue" href="#album" aria-label="Scroll to the album">
+      <span class="scroll-ball" aria-hidden="true">⚽</span>
+      <span class="scroll-text">Open the album</span>
+    </a>
+  </header>
+
+  <main>
+    <!-- ============================ ALBUM ============================ -->
+    <section class="album" id="album" aria-labelledby="album-h">
+      <div class="section-head">
+        <p class="kicker">The Album</p>
+        <h2 id="album-h">48 Stickers · One Trophy</h2>
+        <p class="section-lede">
+          Every qualified nation, ranked by its modelled chance of lifting the cup.
+          The top six are the rare gold-foil contenders. Tap any sticker for its road to the final.
+        </p>
+      </div>
+      <ul class="sticker-grid" id="sticker-grid" role="list" aria-label="Teams ranked by title probability">
+        <!-- sticker cards injected by album.js -->
+      </ul>
+    </section>
+
+    <!-- ============================ HOW IT WORKS ============================ -->
+    <section class="rules" id="rules" aria-labelledby="rules-h">
+      <div class="rules-card">
+        <p class="kicker">Album Rules</p>
+        <h2 id="rules-h">How it works (and what it isn&rsquo;t)</h2>
+        <div class="rules-grid">
+          <ol class="rules-steps">
+            <li>
+              <span class="step-no">1</span>
+              <div>
+                <h3>Self-computed strength</h3>
+                <p>Every team gets an Elo rating built from match history — no borrowed power rankings.</p>
+              </div>
+            </li>
+            <li>
+              <span class="step-no">2</span>
+              <div>
+                <h3>A Bayesian goal model</h3>
+                <p>Model M1 — a dynamic hierarchical Poisson fit with NUTS — turns ratings into goal expectations with full uncertainty.</p>
+              </div>
+            </li>
+            <li>
+              <span class="step-no">3</span>
+              <div>
+                <h3>20,000 tournaments</h3>
+                <p>We play the whole World Cup twenty-thousand times over, group stage to final, and count how often each team ends up lifting it.</p>
+              </div>
+            </li>
+          </ol>
+          <aside class="caveat" aria-label="The honest caveat">
+            <span class="caveat-mark">!</span>
+            <h3>Read this part</h3>
+            <p id="caveat-text">Loading&hellip;</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="site-footer">
+    <p class="foot-method" id="foot-method">&mdash;</p>
+    <p class="foot-asof" id="foot-asof"></p>
+    <p class="foot-disclaimer">A personal model. Not affiliated with FIFA or Panini.</p>
+    <p class="foot-credit">Built as a study in honest probability · THE ALBUM &rsquo;26</p>
+  </footer>
+
+  <!-- ============================ TEAM DETAIL MODAL ============================ -->
+  <div class="detail-backdrop" id="detail-backdrop" hidden>
+    <div class="detail-card" id="detail-card" role="dialog" aria-modal="true" aria-labelledby="detail-name" tabindex="-1">
+      <button class="detail-close" id="detail-close" aria-label="Close team detail">&times;</button>
+      <div class="detail-head">
+        <span class="detail-flag" id="detail-flag">⚽</span>
+        <div>
+          <span class="detail-rank" id="detail-rank">#—</span>
+          <h2 class="detail-name" id="detail-name">Team</h2>
+          <span class="detail-group" id="detail-group">GRP —</span>
+        </div>
+      </div>
+      <p class="detail-sub">Road to the final</p>
+      <ol class="ladder" id="detail-ladder" aria-label="Round-by-round probability">
+        <!-- ladder rungs injected by detail.js -->
+      </ol>
+    </div>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
