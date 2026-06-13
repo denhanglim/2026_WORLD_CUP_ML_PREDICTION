@@ -152,6 +152,27 @@ button:focus-visible,
   margin: 0 0 1.6rem;
 }
 
+/* Persistent top-right link to the maths page */
+.album-topnav {
+  position: absolute;
+  top: clamp(1rem, 3vw, 1.8rem);
+  right: clamp(1rem, 4vw, 2.4rem);
+  z-index: 5;
+}
+.topnav-link {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--ink);
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  background: rgba(250, 243, 224, 0.7);
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.topnav-link:hover { background: var(--ink); color: var(--paper); transform: translateY(-2px); }
+
 .hero-nav { display: flex; gap: 0.8rem; flex-wrap: wrap; }
 
 .btn {
