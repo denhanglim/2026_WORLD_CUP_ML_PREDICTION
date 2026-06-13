@@ -2,7 +2,7 @@ date,home_team,away_team,home_score,away_score,tournament,city,country,neutral
 2018-01-01,Alpha,Delta,3,0,Friendly,TownA,Aland,False
 2018-02-01,Beta,Gamma,1,1,Friendly,TownB,Bland,False
 2018-03-01,Alpha,Beta,2,0,Friendly,TownA,Aland,False
-2018-04-01,Gamma,Delta,2,1,FIFA World Cup qualification,TownC,Cland,False
+2018-04-01,Gamma,Delta,4,0,FIFA World Cup qualification,TownC,Cland,False
 2018-05-01,Delta,Beta,0,2,Friendly,TownD,Dland,False
 2018-06-01,Alpha,Gamma,4,0,FIFA World Cup,TownN,Nland,True
 2018-07-01,Beta,Alpha,0,1,Friendly,TownB,Bland,False
