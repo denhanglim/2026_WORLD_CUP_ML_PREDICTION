@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>The Maths — THE ALBUM '26</title>
+  <meta name="description" content="The full mathematics behind THE ALBUM '26 World Cup model: Elo, a dynamic hierarchical Poisson goal model with Dixon-Coles, the meta-learner, proper scoring rules and the Monte Carlo tournament simulation." />
+
+  <!-- Fonts: Bricolage Grotesque (display), Fraunces (body), Space Mono (stats) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Inline SVG football favicon (no extra request, keeps console clean) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23fff' stroke='%232B2A26' stroke-width='2'/%3E%3Cpolygon points='16,9 21,13 19,19 13,19 11,13' fill='%232B2A26'/%3E%3C/svg%3E" />
+
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/math.css" />
+
+  <!-- KaTeX (faster + lighter than MathJax) via CDN: CSS + JS + auto-render -->
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+"
+    crossorigin="anonymous" />
+  <script defer
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+    integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
+    crossorigin="anonymous"></script>
+  <script defer
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk"
+    crossorigin="anonymous"></script>
+</head>
+<body class="math-body math-page">
+  <!-- Print-stock halftone texture overlay (decorative) -->
+  <div class="halftone" aria-hidden="true"></div>
+
+  <a class="skip-link" href="#sec-pipeline">Skip to the maths</a>
+
+  <!-- ============================ TOP BAR ============================ -->
+  <header class="math-topbar">
+    <a class="back-link" href="./index.html">
+      <span aria-hidden="true">&larr;</span> Back to the album
+    </a>
+    <span class="topbar-label">The Maths</span>
+  </header>
+
+  <!-- ============================ TITLE ============================ -->
+  <section class="math-hero" aria-labelledby="page-title">
+    <p class="kicker">Worked Solutions</p>
+    <h1 class="math-title" id="page-title">The Maths</h1>
+    <p class="math-framing">
+      From 150 years of results to one number per team &mdash; every layer, written out.
+    </p>
+  </section>
+
+  <!-- ============================ TABLE OF CONTENTS ============================ -->
+  <nav class="math-toc" aria-label="Sections of this page">
+    <div class="math-toc-card">
+      <h2>On this page</h2>
+      <ul class="toc-list">
+        <li><a href="#sec-pipeline">The pipeline</a></li>
+        <li><a href="#sec-elo">Elo ratings</a></li>
+        <li><a href="#sec-m1">M1 — hierarchical Poisson</a></li>
+        <li><a href="#sec-m2m3">M2 &amp; M3 — boosting &amp; the market</a></li>
+        <li><a href="#sec-meta">The meta-learner</a></li>
+        <li><a href="#sec-scoring">How we score it</a></li>
+        <li><a href="#sec-montecarlo">Monte Carlo</a></li>
+        <li><a href="#sec-limits">Honest limits</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="math-main">
+
+    <!-- ===================== 1. THE PIPELINE ===================== -->
+    <section class="math-section" id="sec-pipeline" aria-labelledby="h-pipeline">
+      <span class="section-num" aria-hidden="true">1</span>
+      <h2 id="h-pipeline">The pipeline</h2>
+      <p class="lead">
+        One number per team is the end of a chain: raw match history becomes strength signals,
+        several match models turn those into outcome probabilities, a meta-learner blends them, and
+        a tournament simulation turns match probabilities into a title chance.
+      </p>
+      <ul class="pipeline" aria-label="Model pipeline overview">
+        <li><span class="stage">Data</span> <span class="arrow" aria-hidden="true">&rarr;</span></li>
+        <li><span class="stage">Elo &amp; features</span> <span class="arrow" aria-hidden="true">&rarr;</span></li>
+        <li><span class="stage">Match models</span> <span class="arrow" aria-hidden="true">&rarr;</span></li>
+        <li><span class="stage">Meta-learner</span> <span class="arrow" aria-hidden="true">&rarr;</span></li>
+        <li><span class="stage">Monte Carlo</span> <span class="arrow" aria-hidden="true">&rarr;</span></li>
+        <li><span class="stage">Win probabilities</span></li>
+      </ul>
+      <p class="muted">
+        The match-models layer is itself three models &mdash; a Bayesian Poisson goal model, a
+        gradient-boosting classifier, and de-vigged market odds &mdash; stacked by the meta-learner.
+      </p>
+    </section>
+
+    <!-- ===================== 2. ELO ===================== -->
+    <section class="math-section" id="sec-elo" aria-labelledby="h-elo">
+      <span class="section-num" aria-hidden="true">2</span>
+      <h2 id="h-elo">Elo ratings</h2>
+      <p>The baseline strength signal. Expected score for the home team, with home advantage
+        <span class="var">H</span> (zero on neutral ground):</p>
+      <div class="eq eq-labelled">
+        <span class="eq-tag">Expected score (home)</span>
+        $$E_{\text{home}} = \frac{1}{1 + 10^{-\big((R_{\text{home}} + H) - R_{\text{away}}\big)/400}}$$
+      </div>
+
+      <p>Update after a match (<span class="var">W &isin; {1, &frac12;, 0}</span> for win / draw /
+        loss, zero-sum):</p>
+      <div class="eq eq-labelled">
+        <span class="eq-tag">Rating update</span>
+        $$R' = R + K \cdot G \cdot (W - E)$$
+      </div>
+
+      <p>Margin-of-victory multiplier <span class="var">G</span> (goal difference
+        <span class="var">d</span>):</p>
+      <div class="eq eq-labelled">
+        <span class="eq-tag">Margin multiplier</span>
+        $$G = \begin{cases} 1 & |d| \le 1 \\ 1.5 & |d| = 2 \\ \dfrac{11 + |d|}{8} & |d| \ge 3 \end{cases}$$
+      </div>
+
+      <p class="note">
+        <strong>On the gain factor.</strong> <span class="var">K</span> scales with match
+        importance &mdash; World Cup <span class="var">= 60</span>, continental
+        <span class="var">= 50</span>, qualifiers <span class="var">= 40</span>, friendlies
+        <span class="var">= 20</span>. Computed from results alone &mdash; fully reproducible.
+      </p>
+    </section>
+
+    <!-- ===================== 3. M1 ===================== -->
+    <section class="math-section" id="sec-m1" aria-labelledby="h-m1">
+      <span class="section-num" aria-hidden="true">3</span>
+      <h2 id="h-m1">M1 &mdash; dynamic hierarchical Poisson goal model</h2>
+      <p class="muted">The flagship.</p>
+      <p>Each team <span class="var">i</span> has a latent <strong>attack</strong>
+        <span class="var">&alpha;<sub>i,t</sub></span> and <strong>defense</strong>
+        <span class="var">&beta;<sub>i,t</sub></span> at period <span class="var">t</span>. Expected
+        goals:</p>
+      <div class="eq">
+        $$\log \lambda_{\text{home}} = \mu + h\,\mathbb{1}[\text{not neutral}] + \alpha_{\text{home},t} - \beta_{\text{away},t}$$
+      </div>
+      <div class="eq">
+        $$\log \lambda_{\text{away}} = \mu + \alpha_{\text{away},t} - \beta_{\text{home},t}$$
+      </div>
+
+      <h3>Dynamic state-space</h3>
+      <p>Strengths evolve as a Gaussian random walk across yearly periods:</p>
+      <div class="eq">
+        $$\alpha_{i,t} = \alpha_{i,t-1} + \varepsilon_{i,t}, \qquad \varepsilon_{i,t} \sim \mathcal{N}(0, \sigma_{\text{evo}}^2)$$
+      </div>
+
+      <h3>Hierarchical priors</h3>
+      <p>Partial pooling shrinks small-sample teams toward the mean:</p>
+      <div class="eq">
+        $$\alpha_{i,0},\,\beta_{i,0} \sim \mathcal{N}(0, \sigma^2), \quad \sigma_{\text{att}},\sigma_{\text{def}} \sim \text{HalfNormal}(1), \quad \sigma_{\text{evo}} \sim \text{HalfNormal}(0.15)$$
+      </div>
+      <div class="eq">
+        $$\mu \sim \mathcal{N}(0,1), \quad h \sim \mathcal{N}(0.25, 0.5), \quad \rho \sim \mathcal{N}(0, 0.1)$$
+      </div>
+
+      <h3>Likelihood</h3>
+      <p>Independent Poisson for the two goal counts:</p>
+      <div class="eq">
+        $$\text{home goals} \sim \text{Poisson}(\lambda_{\text{home}}), \qquad \text{away goals} \sim \text{Poisson}(\lambda_{\text{away}})$$
+      </div>
+
+      <h3>Dixon&ndash;Coles low-score correction</h3>
+      <p>The correction <span class="var">&tau;</span> fixes the false independence on
+        0&ndash;0 / 1&ndash;0 / 0&ndash;1 / 1&ndash;1 scorelines, applied to the joint pmf:</p>
+      <div class="eq">
+        $$\tau(x,y) = \begin{cases} 1 - \lambda_{\text{home}}\lambda_{\text{away}}\rho & (x,y)=(0,0) \\ 1 + \lambda_{\text{home}}\rho & (x,y)=(0,1) \\ 1 + \lambda_{\text{away}}\rho & (x,y)=(1,0) \\ 1 - \rho & (x,y)=(1,1) \\ 1 & \text{otherwise} \end{cases}$$
+      </div>
+
+      <p>Full joint scoreline probability:</p>
+      <div class="eq">
+        $$P(X=x, Y=y) = \tau(x,y)\cdot \frac{\lambda_{\text{home}}^{x} e^{-\lambda_{\text{home}}}}{x!}\cdot \frac{\lambda_{\text{away}}^{y} e^{-\lambda_{\text{away}}}}{y!}$$
+      </div>
+
+      <p>The posterior over all <span class="var">{&alpha;, &beta;, &mu;, h, &rho;, &sigma;}</span>
+        is sampled with <strong>NUTS</strong> (Hamiltonian Monte Carlo). Match outcome
+        probabilities come from summing the (normalised) score grid:</p>
+      <div class="eq">
+        $$P(\text{home win}) = \sum_{x&gt;y} P(x,y),\quad P(\text{draw}) = \sum_{x=y} P(x,y),\quad P(\text{away win}) = \sum_{x&lt;y} P(x,y)$$
+      </div>
+    </section>
+
+    <!-- ===================== 4. M2 & M3 ===================== -->
+    <section class="math-section" id="sec-m2m3" aria-labelledby="h-m2m3">
+      <span class="section-num" aria-hidden="true">4</span>
+      <h2 id="h-m2m3">M2 &amp; M3 &mdash; gradient boosting and the market</h2>
+      <h3>M2 &mdash; gradient boosting</h3>
+      <p>A gradient-boosted classifier on engineered features (Elo difference, form, rest, rolling
+        goals&hellip;) producing calibrated
+        <span class="var">P(W / D / L)</span>. No heavy formula needed.</p>
+
+      <h3>M3 &mdash; de-vigging the odds</h3>
+      <p>Strip the bookmaker margin from decimal odds <span class="var">o<sub>i</sub></span>:</p>
+      <div class="eq">
+        $$p_i = \frac{1/o_i}{\sum_{j} 1/o_j}$$
+      </div>
+    </section>
+
+    <!-- ===================== 5. META-LEARNER ===================== -->
+    <section class="math-section" id="sec-meta" aria-labelledby="h-meta">
+      <span class="section-num" aria-hidden="true">5</span>
+      <h2 id="h-meta">The meta-learner (stacking)</h2>
+      <p>Stack the base models' probability vectors and combine with multinomial logistic
+        regression &mdash; a softmax over a linear map of the concatenated base probabilities:</p>
+      <div class="eq">
+        $$\mathbf{x} = \big[\,\mathbf{p}^{(\text{M1})} \,\|\, \mathbf{p}^{(\text{M2})} \,\|\, \mathbf{p}^{(\text{odds})}\,\big], \qquad P(\text{class}=k) = \frac{e^{\mathbf{w}_k^\top \mathbf{x} + b_k}}{\sum_{c} e^{\mathbf{w}_c^\top \mathbf{x} + b_c}}$$
+      </div>
+      <p class="muted">Trained walk-forward on out-of-sample base predictions &mdash; no leakage.</p>
+    </section>
+
+    <!-- ===================== 6. SCORING ===================== -->
+    <section class="math-section" id="sec-scoring" aria-labelledby="h-scoring">
+      <span class="section-num" aria-hidden="true">6</span>
+      <h2 id="h-scoring">How we score it (proper scoring rules)</h2>
+      <p>Outcomes are ordinal (<span class="var">H &prec; D &prec; A</span>). The
+        <strong>Ranked Probability Score</strong> is primary:</p>
+      <div class="eq eq-labelled">
+        <span class="eq-tag">RPS (primary)</span>
+        $$\text{RPS} = \frac{1}{r-1}\sum_{i=1}^{r-1}\left(\sum_{j=1}^{i} p_j - \sum_{j=1}^{i} o_j\right)^2, \quad r = 3$$
+      </div>
+
+      <p>Also <strong>Brier</strong> <span class="var">&sum;<sub>k</sub> (p<sub>k</sub> &minus;
+        o<sub>k</sub>)&sup2;</span> and <strong>log-loss</strong>
+        <span class="var">&minus;log p<sub>true</sub></span>. <strong>Calibration</strong> is
+        measured via Expected Calibration Error over <span class="var">B</span> bins:</p>
+      <div class="eq eq-labelled">
+        <span class="eq-tag">ECE (calibration)</span>
+        $$\text{ECE} = \sum_{b=1}^{B} \frac{n_b}{N}\,\big|\,\text{acc}_b - \text{conf}_b\,\big|$$
+      </div>
+
+      <p class="note">
+        <strong>Backtest headline.</strong> The meta-learner reached
+        RPS <span class="var">&approx; 0.1999</span> on WC 2010&ndash;2022, beating the Elo baseline
+        <span class="var">&approx; 0.2022</span>.
+      </p>
+    </section>
+
+    <!-- ===================== 7. MONTE CARLO ===================== -->
+    <section class="math-section" id="sec-montecarlo" aria-labelledby="h-mc">
+      <span class="section-num" aria-hidden="true">7</span>
+      <h2 id="h-mc">Monte Carlo &mdash; turning match models into a champion</h2>
+      <p>The crux is a <strong>posterior-propagated, correlated</strong> simulation. For each
+        simulation <span class="var">s = 1, &hellip;, N</span> (<span class="var">N = 20,000</span>),
+        draw <em>one</em> posterior sample of every team's strengths
+        <span class="var">&theta;<sup>(s)</sup> = {&alpha;<sup>(s)</sup>, &beta;<sup>(s)</sup>,
+        &hellip;}</span>, then play the <strong>entire</strong> 48-team tournament under that single
+        draw (group stage with FIFA tiebreakers &rarr; 8 best third-placed &rarr; knockout with
+        extra time and penalties), sampling scorelines from the Poisson rates:</p>
+      <div class="eq">
+        $$\theta^{(s)} \sim \text{posterior}, \qquad \text{champion}_s = \text{Simulate}\big(\text{bracket} \mid \theta^{(s)}\big)$$
+      </div>
+      <p>Because one <span class="var">&theta;<sup>(s)</sup></span> governs all of a team's matches
+        in simulation <span class="var">s</span>, outcomes are <strong>correlated</strong> &mdash; a
+        secretly-strong team is strong in every match that sim &mdash; capturing tail behaviour that
+        naive per-match sampling misses. The title probability is the Monte Carlo average:</p>
+      <div class="eq eq-labelled">
+        <span class="eq-tag">Title probability</span>
+        $$P(\text{team wins}) = \frac{1}{N}\sum_{s=1}^{N}\mathbb{1}\big[\text{champion}_s = \text{team}\big]$$
+      </div>
+    </section>
+
+    <!-- ===================== 8. HONEST LIMITS ===================== -->
+    <section class="math-section limits" id="sec-limits" aria-labelledby="h-limits">
+      <span class="limits-mark" aria-hidden="true">!</span>
+      <h2 id="h-limits">Honest limits</h2>
+      <p>Single-elimination is high variance &mdash; even the favourite is only about
+        <strong>1-in-5</strong>. The model is calibrated and uncertainty-aware, not an oracle.</p>
+      <p>Two approximations are documented honestly:</p>
+      <ul>
+        <li>Group tiebreakers beyond goal difference and goals-for use a random draw.</li>
+        <li>The 8 best third-placed teams fill the round-of-32 slots by a fixed rule, not FIFA's
+          exact combination table.</li>
+      </ul>
+      <p class="muted">The match model trains on history; the 48-team bracket is rule-encoded &mdash;
+        there is no precedent for it.</p>
+    </section>
+
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="site-footer">
+    <p class="foot-disclaimer">A personal model. Not affiliated with FIFA or Panini.</p>
+    <p class="foot-credit">Built as a study in honest probability &middot; THE ALBUM &rsquo;26</p>
+    <a class="math-foot-back" href="./index.html">&larr; Back to the album</a>
+  </footer>
+
+  <!-- ============================ KaTeX render + calm reveals ============================ -->
+  <script>
+    (function () {
+      const reduce = window.matchMedia
+        && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function renderMath() {
+        if (!window.renderMathInElement) return false;
+        window.renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "\\(", right: "\\)", display: false },
+          ],
+          throwOnError: false,
+        });
+        return true;
+      }
+
+      // auto-render.min.js is deferred; run after it (and KaTeX) are ready.
+      function onReady() {
+        if (renderMath()) {
+          setupReveals();
+        } else {
+          // auto-render not parsed yet — try again next frame, bounded.
+          let tries = 0;
+          const t = setInterval(function () {
+            if (renderMath() || ++tries > 40) {
+              clearInterval(t);
+              setupReveals();
+            }
+          }, 50);
+        }
+      }
+
+      // Calm scroll reveals (sections fade/slide up once). No-op under reduced motion.
+      function setupReveals() {
+        if (reduce || !("IntersectionObserver" in window)) return;
+        const targets = document.querySelectorAll(".math-section, .math-toc-card");
+        document.body.classList.add("reveal-ready");
+
+        function show(el) {
+          el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        }
+
+        const io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { show(e.target); io.unobserve(e.target); }
+          });
+        }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+        targets.forEach(function (el) { io.observe(el); });
+
+        // Safety net: content must never stay hidden. Reveal anything still
+        // invisible after a short grace period (covers no-scroll / capture cases).
+        setTimeout(function () {
+          targets.forEach(function (el) {
+            if (getComputedStyle(el).opacity !== "1") { show(el); io.unobserve(el); }
+          });
+        }, 1400);
+      }
+
+      if (document.readyState === "loading") {
+        window.addEventListener("DOMContentLoaded", onReady);
+      } else {
+        onReady();
+      }
+    })();
+  </script>
+</body>
+</html>

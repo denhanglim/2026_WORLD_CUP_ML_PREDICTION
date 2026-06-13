@@ -1,0 +1,322 @@
+/* ============================================================
+   THE MATHS — worked-solution page for THE ALBUM '26
+   Exercise-book / chalk-on-cream feel. Reuses styles.css palette
+   variables (--paper, --ink, --pitch, --gold, fonts, etc).
+   Light, never dark.
+   ============================================================ */
+
+/* ---- Page rhythm ------------------------------------------------ */
+.math-page {
+  --measure: 760px;            /* readable column width for prose */
+  --rule: rgba(43, 42, 38, 0.12);
+}
+
+/* Faint blue exercise-book ruling behind the whole page, very subtle */
+body.math-body {
+  background:
+    radial-gradient(120% 90% at 50% -10%, var(--paper) 0%, var(--paper-2) 100%) fixed;
+}
+
+/* ---- Top bar (back-link + section nav) -------------------------- */
+.math-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem clamp(1rem, 4vw, 2.4rem);
+  background: rgba(250, 243, 224, 0.86);
+  backdrop-filter: saturate(1.2) blur(8px);
+  -webkit-backdrop-filter: saturate(1.2) blur(8px);
+  border-bottom: 2px solid var(--rule);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-decoration: none;
+  color: var(--ink);
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  background: transparent;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.back-link:hover { background: var(--ink); color: var(--paper); transform: translateY(-2px); }
+
+.topbar-label {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.66rem;
+  color: var(--pitch-deep);
+  margin-left: auto;
+}
+
+/* ---- Title block ------------------------------------------------ */
+.math-hero {
+  padding: clamp(2.4rem, 7vw, 5rem) clamp(1rem, 4vw, 2.4rem) clamp(1.5rem, 4vw, 2.5rem);
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+.math-hero .kicker { text-align: left; }
+.math-title {
+  font-size: clamp(2.6rem, 9vw, 6rem);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-shadow: 0 3px 0 rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+.math-framing {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+  color: var(--ink-soft);
+  max-width: 48ch;
+  margin: 1rem 0 0;
+}
+
+/* ---- Table of contents ----------------------------------------- */
+.math-toc {
+  max-width: var(--maxw);
+  margin: clamp(1.5rem, 4vw, 2.5rem) auto 0;
+  padding: clamp(1.2rem, 3vw, 1.8rem) clamp(1rem, 4vw, 2.4rem);
+}
+.math-toc-card {
+  background: var(--paper);
+  border: 2px solid var(--rule);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sticker);
+  padding: clamp(1.2rem, 3vw, 1.8rem);
+}
+.math-toc h2 {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  color: var(--pitch-deep);
+  margin: 0 0 1rem;
+}
+.toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.5rem 1.4rem;
+  counter-reset: toc;
+}
+.toc-list li { counter-increment: toc; }
+.toc-list a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.toc-list a::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--gold-deep);
+  flex: none;
+}
+.toc-list a:hover { color: var(--pitch-deep); border-bottom-color: var(--pitch); }
+
+/* ---- Body sections --------------------------------------------- */
+.math-main {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2.4rem) 1rem;
+}
+
+.math-section {
+  background: var(--paper);
+  border: 2px solid var(--rule);
+  border-radius: 22px;
+  box-shadow: var(--shadow-sticker);
+  padding: clamp(1.4rem, 4vw, 2.6rem);
+  margin: 0 auto clamp(1.4rem, 3vw, 2rem);
+  /* offset for sticky topbar anchor jumps */
+  scroll-margin-top: 78px;
+}
+
+.section-num {
+  display: inline-grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--pitch);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  margin-bottom: 0.9rem;
+}
+.math-section h2 {
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  letter-spacing: -0.01em;
+  margin: 0 0 0.4rem;
+}
+.math-section h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 1.6rem 0 0.4rem;
+  color: var(--ink);
+}
+.math-section p {
+  max-width: var(--measure);
+  margin: 0.6rem 0;
+  font-size: 1.04rem;
+  color: var(--ink);
+}
+.math-section p.muted { color: var(--ink-soft); }
+.math-section .lead {
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+}
+.math-section ul {
+  max-width: var(--measure);
+  margin: 0.6rem 0;
+  padding-left: 1.2rem;
+}
+.math-section li { margin: 0.35rem 0; }
+
+/* Inline mono symbols / variable names */
+.var {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: rgba(43, 42, 38, 0.06);
+  padding: 0.06em 0.36em;
+  border-radius: 6px;
+}
+
+/* A labelled note line (e.g. the K-value / margin notes) */
+.note {
+  display: block;
+  border-left: 3px solid var(--gold);
+  background: rgba(232, 198, 107, 0.12);
+  padding: 0.7rem 1rem;
+  border-radius: 0 10px 10px 0;
+  margin: 1rem 0;
+  max-width: var(--measure);
+  font-size: 0.98rem;
+  color: var(--ink-soft);
+}
+.note strong { color: var(--ink); }
+
+/* ---- Equation containers (horizontal scroll on overflow) -------- */
+.eq {
+  /* the worked-solution slab */
+  margin: 1.1rem 0;
+  padding: 0.9rem 1.1rem;
+  background: #FFFDF4;
+  border: 1.5px solid var(--rule);
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  overflow-x: auto;            /* let wide display math scroll, not overflow */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.eq.eq-labelled { position: relative; }
+.eq-tag {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 0.3rem;
+}
+/* KaTeX display blocks shouldn't add their own margin inside our slab */
+.eq .katex-display { margin: 0; }
+.eq .katex { font-size: 1.12em; }
+
+/* ---- Pipeline flow --------------------------------------------- */
+.pipeline {
+  list-style: none;
+  margin: 1.2rem 0 0.4rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+.pipeline li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+.pipeline .stage {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.84rem;
+  background: var(--mint);
+  border: 1.5px solid var(--pitch);
+  color: var(--pitch-deep);
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.pipeline .arrow {
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+/* ---- Honest-limits panel (mirror index .caveat) ----------------- */
+.limits {
+  background: linear-gradient(160deg, #fff 0%, var(--peach) 200%);
+  border: 2px solid var(--coral);
+  border-radius: 22px;
+  position: relative;
+}
+.limits .limits-mark {
+  position: absolute; top: -16px; left: 22px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--coral); color: #fff;
+  display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.25rem;
+}
+
+/* ---- Footer (re-uses .site-footer from styles.css) -------------- */
+.math-foot-back {
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---- Scroll-reveal initial state (only when JS opts in) --------- */
+.reveal-ready .math-section,
+.reveal-ready .math-toc-card { opacity: 0; transform: translateY(18px); }
+
+/* ---- Responsive ------------------------------------------------- */
+@media (max-width: 600px) {
+  .math-section { padding: 1.2rem 1rem; border-radius: 16px; }
+  .eq { padding: 0.7rem 0.8rem; }
+  .eq .katex { font-size: 1em; }
+  .toc-list { grid-template-columns: 1fr; }
+}
+
+/* ---- Reduced motion -------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready .math-section,
+  .reveal-ready .math-toc-card { opacity: 1; transform: none; }
+}
