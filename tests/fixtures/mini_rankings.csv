@@ -1,0 +1,9 @@
+rank,country_full,country_abrv,total_points,rank_date
+1,Alpha,ALP,1800,2018-01-15
+2,Beta,BET,1700,2018-01-15
+3,Gamma,GAM,1500,2018-01-15
+4,Delta,DEL,1400,2018-01-15
+1,Alpha,ALP,1820,2018-05-15
+3,Beta,BET,1650,2018-05-15
+2,Gamma,GAM,1660,2018-05-15
+4,Delta,DEL,1390,2018-05-15
