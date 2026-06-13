@@ -8,11 +8,14 @@ from .calibration import ece
 
 def walk_forward(feats: pd.DataFrame, cutoffs: Sequence[pd.Timestamp],
                  model_factory: Callable[[], "object"],
-                 features: List[str]) -> pd.DataFrame:
+                 features: List[str],
+                 eval_filter: Callable[[pd.DataFrame], pd.Series] = None) -> pd.DataFrame:
     """For each cutoff: train on date < cutoff, evaluate on [cutoff, next_cutoff).
 
     `feats` needs columns: `date`, `result`, and every name in `features`.
     `model_factory` returns a fresh unfitted model each call (fit/predict_proba).
+    If `eval_filter` is given (callable df->bool mask), the eval set is further restricted
+    (e.g. to World Cup matches only).
     """
     cutoffs = list(cutoffs)
     rows = []
@@ -20,6 +23,8 @@ def walk_forward(feats: pd.DataFrame, cutoffs: Sequence[pd.Timestamp],
         hi = cutoffs[i + 1] if i + 1 < len(cutoffs) else feats["date"].max() + pd.Timedelta(days=1)
         train = feats[feats["date"] < cut]
         evalw = feats[(feats["date"] >= cut) & (feats["date"] < hi)]
+        if eval_filter is not None:
+            evalw = evalw[eval_filter(evalw)]
         if len(train) == 0 or len(evalw) == 0:
             continue
         model = model_factory()
